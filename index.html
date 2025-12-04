@@ -249,88 +249,71 @@
     </footer>
     
     <script>
-        feather.replace();
-                
-        const images = [
-            "source/1.jpg",
-            "source/2.jpg",
-            "source/3.jpg",
-            "source/4.jpg",
-            "source/5.jpg",
-            "source/6.jpg",
-            "source/7.jpg",
-            "source/8.jpg",
-            "source/9.jpg",
-            "source/10.jpg",
-            "source/11.jpg",
-            "source/12.jpg",
-            "source/13.jpg",
-            "source/14.jpg"
-        ];
-        
-        let currentIndex = 0;
-        
-        function openModal(index) {
-            currentIndex = index;
-            document.getElementById('modal').classList.add('show');
-            document.getElementById('modalImg').src = images[currentIndex];
+    feather.replace();
+
+    const galleryImages = Array.from(
+    document.querySelectorAll("#gallery img")
+    ).map(img => img.src);
+
+    let currentIndex = 0;
+
+    function openModal(index) {
+        currentIndex = index;
+        document.getElementById('modal').classList.add('show');
+        document.getElementById('modalImg').src = galleryImages[currentIndex];
+    }
+
+    function closeModal() {
+        document.getElementById('modal').classList.remove('show');
+    }
+
+    function closeModalIfOutside(event) {
+        if (event.target === document.getElementById('modal')) {
+            closeModal();
         }
-        
-        function closeModal() {
-            document.getElementById('modal').classList.remove('show');
+    }
+
+    function changeImage(direction) {
+        currentIndex += direction;
+
+        if (currentIndex >= galleryImages.length) {
+            currentIndex = 0;
+        } 
+        if (currentIndex < 0) {
+            currentIndex = galleryImages.length - 1;
         }
-        
-        function closeModalIfOutside(event) {
-            if (event.target === document.getElementById('modal')) {
-                closeModal();
-            }
+
+        document.getElementById('modalImg').src = galleryImages[currentIndex];
+    }
+
+    // Клавиатура
+    document.addEventListener('keydown', function(event) {
+        if (document.getElementById('modal').classList.contains('show')) {
+            if (event.key === 'ArrowLeft') changeImage(-1);
+            if (event.key === 'ArrowRight') changeImage(1);
+            if (event.key === 'Escape') closeModal();
         }
-        
-        function changeImage(direction) {
-            currentIndex += direction;
-            if (currentIndex >= images.length) {
-                currentIndex = 0;
-            } else if (currentIndex < 0) {
-                currentIndex = images.length - 1;
-            }
-            document.getElementById('modalImg').src = images[currentIndex];
-        }
-        
-        // Keyboard navigation
-        document.addEventListener('keydown', function(event) {
-            if (document.getElementById('modal').classList.contains('show')) {
-                if (event.key === 'ArrowLeft') {
-                    changeImage(-1);
-                } else if (event.key === 'ArrowRight') {
-                    changeImage(1);
-                } else if (event.key === 'Escape') {
-                    closeModal();
-                }
-            }
+    });
+
+    // Свайп
+    let touchStartX = 0;
+    let touchEndX = 0;
+
+    document.getElementById('modal').addEventListener('touchstart', function(event) {
+        touchStartX = event.changedTouches[0].screenX;
+    });
+
+    document.getElementById('modal').addEventListener('touchend', function(event) {
+        touchEndX = event.changedTouches[0].screenX;
+        if (touchStartX - touchEndX > 50) changeImage(1);
+        if (touchEndX - touchStartX > 50) changeImage(-1);
+    });
+
+    function copyToClipboard(text) {
+        navigator.clipboard.writeText(text).then(() => {
+            alert('Скопировано в буфер обмена!');
         });
-        
-        // Basic touch swipe
-        let touchStartX = 0;
-        let touchEndX = 0;
-        document.getElementById('modal').addEventListener('touchstart', function(event) {
-            touchStartX = event.changedTouches[0].screenX;
-        });
-        document.getElementById('modal').addEventListener('touchend', function(event) {
-            touchEndX = event.changedTouches[0].screenX;
-            if (touchStartX - touchEndX > 50) {
-                changeImage(1);
-            } else if (touchEndX - touchStartX > 50) {
-                changeImage(-1);
-            }
-        });
-        
-        function copyToClipboard(text) {
-            navigator.clipboard.writeText(text).then(function() {
-                alert('Скопировано в буфер обмена!');
-            }, function(err) {
-                alert('Ошибка копирования: ' + err);
-            });
-        }
+    }
     </script>
 </body>
 </html>
